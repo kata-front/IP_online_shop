@@ -1,8 +1,33 @@
 import type {FC} from "react";
 import { Link } from "react-router-dom";
 import "./login.scss";
+import { type Login } from "../../utils/types";
+import loginApi from "./loginApi.ts";
 
 const Login: FC = () => {
+    const [login] = loginApi.useLoginMutation()
+
+    const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+
+        if (!e.currentTarget.email.value
+            || !e.currentTarget.password.value
+            || e.currentTarget.password.value.length < 8
+            || !e.currentTarget.remember.checked
+        )
+        {
+            alert('Пожалуйста, заполните все поля и чекбокс')
+        }
+
+        const data: Login = {
+            email: e.currentTarget.email.value,
+            password: e.currentTarget.password.value
+        }
+
+        const responce = await login(data)
+        console.log(responce)
+    }
+
     return (
         <div className="login">
             <div className="login-container">
@@ -12,7 +37,7 @@ const Login: FC = () => {
                         <p>Добро пожаловать!</p>
                     </div>
 
-                    <form className="login-form">
+                    <form className="login-form" onSubmit={handleSubmit}>
                         <div className="form-group">
                             <label htmlFor="email">Email</label>
                             <input 
@@ -35,7 +60,7 @@ const Login: FC = () => {
 
                         <div className="form-options">
                             <label className="checkbox-label">
-                                <input type="checkbox" />
+                                <input type="checkbox" name="remember" id="remember"/>
                                 <span className="checkmark"></span>
                                 Запомнить меня
                             </label>
