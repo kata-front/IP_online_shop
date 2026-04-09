@@ -1,13 +1,6 @@
-export type Product = {
-    id: number;
-    name: string;
-    price: number;
-    image: string;
-    category: string;
-    description: string;
-}
+// types for auth
 
-export type Register = {
+export type RegisterReq = {
     name: string;
     lastName: string;
     email: string;
@@ -24,7 +17,7 @@ export type RegResponce = {
     error: string
 }
 
-export type Login = {
+export type LoginReq = {
     email: string;
     password: string;
 }
@@ -35,4 +28,15 @@ export type LoginResponce = {
 } | {
     ok: false
     error: string
+}
+
+// types for catalog
+
+export type Product = {
+    id: number;
+    name: string;
+    price: number;
+    image?: string;
+    category: string;
+    description: string;
 }

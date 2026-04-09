@@ -1,11 +1,14 @@
 import type {FC} from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./login.scss";
-import { type Login } from "../../utils/types";
+import { type LoginReq } from "../../utils/types";
 import loginApi from "./loginApi.ts";
+import { useAuth } from "../../contexts/AuthContext";
 
 const Login: FC = () => {
-    const [login] = loginApi.useLoginMutation()
+    const [loginMutation] = loginApi.useLoginMutation()
+    const navigate = useNavigate()
+    const { login: authLogin } = useAuth()
 
     const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -19,13 +22,19 @@ const Login: FC = () => {
             alert('Пожалуйста, заполните все поля и чекбокс')
         }
 
-        const data: Login = {
+        const data: LoginReq = {
             email: e.currentTarget.email.value,
             password: e.currentTarget.password.value
         }
 
-        const responce = await login(data)
-        console.log(responce)
+        const response = await loginMutation(data)
+        
+        if (response.data?.ok) {
+            authLogin(response.data.token)
+            navigate('/')
+        } else {
+            alert(response.data?.error || 'Ошибка входа')
+        }
     }
 
     return (

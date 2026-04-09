@@ -1,8 +1,63 @@
 import type {FC} from "react";
-import { Link } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import "./register.scss";
+import {type RegisterReq} from "../../utils/types";
+import {registerApi} from "./regApi";
+import { useAuth } from "../../contexts/AuthContext";
 
 const Register: FC = () => {
+    const { login } = useAuth()
+    const [register] = registerApi.useRegisterMutation()
+    const navigate = useNavigate()
+
+    const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+
+        if (!e.currentTarget.firstName.value
+            || !e.currentTarget.lastName.value
+            || !e.currentTarget.email.value
+            || !e.currentTarget.phone.value
+            || !e.currentTarget.password.value
+            || !e.currentTarget.confirmPassword.value
+            || !e.currentTarget.birthDate.value
+            || !e.currentTarget.terms.checked
+        )
+        {
+            alert('Пожалуйста, заполните все поля и примите условия использования')
+            return
+        }
+
+        if (e.currentTarget.password.value !== e.currentTarget.confirmPassword.value) {
+            alert('Пароли не совпадают')
+            return
+        }
+
+        if (e.currentTarget.password.value.length < 8) {
+            alert('Пароль должен содержать минимум 8 символов')
+            return
+        }
+
+        const data: RegisterReq = {
+            name: e.currentTarget.firstName.value,
+            lastName: e.currentTarget.lastName.value,
+            email: e.currentTarget.email.value,
+            password: e.currentTarget.password.value,
+            phone: e.currentTarget.phone.value,
+            birthDate: e.currentTarget.birthDate.value
+        }
+
+        const response = await register(data)
+
+        if (response.error) return
+        if (response.data.ok) {
+            login(response.data.token)
+            navigate('/')
+            return
+        } else {
+            alert('Ошибка регистрации')
+        }
+    }
+
     return (
         <div className="register">
             <div className="register-container">
@@ -12,7 +67,7 @@ const Register: FC = () => {
                         <p>Создайте новый аккаунт</p>
                     </div>
 
-                    <form className="register-form">
+                    <form className="register-form" onSubmit={handleSubmit}>
                         <div className="form-row">
                             <div className="form-group">
                                 <label htmlFor="firstName">Имя</label>
@@ -86,7 +141,7 @@ const Register: FC = () => {
 
                         <div className="form-options">
                             <label className="checkbox-label">
-                                <input type="checkbox" required />
+                                <input type="checkbox" name="terms" id="terms" required />
                                 <span className="checkmark"></span>
                                 Я согласен с <Link to="/terms" className="terms-link">условиями использования</Link>
                             </label>

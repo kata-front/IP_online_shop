@@ -1,8 +1,11 @@
 import type {FC} from "react";
 import { Link } from "react-router-dom";
 import "./header.scss";
+import {useAuth} from "../../contexts/AuthContext.tsx";
 
 const Header: FC = () => {
+    const {isAuthenticated} = useAuth()
+
     return (
         <header className="header">
             <div className="header-container">
@@ -28,10 +31,15 @@ const Header: FC = () => {
                     </Link>
                 </nav>
 
-                <div className="header-actions">
-                    <Link to="/login" className="btn btn-outline">Вход</Link>
-                    <Link to="/register" className="btn btn-primary">Регистрация</Link>
-                </div>
+                {isAuthenticated
+                    ? <div>
+
+                    </div>
+                    : <div className="header-actions">
+                        <Link to="/login" className="btn btn-outline">Вход</Link>
+                        <Link to="/register" className="btn btn-primary">Регистрация</Link>
+                    </div>
+                }
             </div>
         </header>
     )
